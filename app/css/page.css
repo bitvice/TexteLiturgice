@@ -1,0 +1,18 @@
+.oPage {
+	position: fixed;
+	top: 		 0 ;
+	bottom:  0 ;
+	left:  100%;
+	width: 100%;
+
+	background-image: url('../images/old_paper.jpg');
+}
+
+.oPage.isActive {
+	left: 0;
+}
+
+.oPage.isRendered {
+	left: -100%;
+}
+
