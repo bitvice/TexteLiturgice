@@ -6,6 +6,7 @@
 	width: 100%;
 
 	background-image: url('../images/old_paper.jpg');
+	background-size: 100% auto;
 }
 
 .oPage.isActive {
@@ -16,3 +17,53 @@
 	left: -100%;
 }
 
+	.oPage_logo {
+		display: block;
+		margin: 3rem auto 1rem;
+	}
+
+	.oPage_link {
+		font-size: 2rem;
+		color: #00c;
+	}
+
+	.oPage_hero {
+		display: block;
+		background-color: #fff;
+		text-align: center;
+	}
+
+		.oPage_hero > img {
+			width: 100%;
+			margin: 1rem auto;
+		}
+
+		@media (min-width: 23rem) {
+			.oPage_hero > img {
+				width: auto;
+				height: 370px;
+			}
+		}
+
+	.oPage_header {
+		display: block;
+		text-align: center;
+		font-size: 2rem;
+		margin: 0 0 1rem ;
+		padding: .5rem;
+	}
+
+.fillMain {
+	background-color: rgba(120,40,0,0.44);
+	color: #6F1D0A;
+}
+
+.fillRoot {
+	background-color: rgba(120,40,0,0.44);
+	color: #fff;
+}
+
+.fillSecondary {
+	background-color: rgba(200,200,200,0.44);
+	color: #6F1D0A;
+}

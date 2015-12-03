@@ -3,26 +3,72 @@
 <head>
     <link rel="stylesheet" href="css/app.css" type="text/css">
     <link rel="stylesheet" href="css/page.css" type="text/css">
+    <link rel="stylesheet" href="css/list-bare.css" type="text/css">
+    <link rel="stylesheet" href="css/animate.css" type="text/css">
     <link rel="stylesheet" href="css/utils.css" type="text/css">
 </head>
 <body>
 
 	<ul class="oPage_list">
 		<li id="page0" class="oPage isActive uCenter">
-    	<img src="images/logo.png" />
-
-    	<h1>Texte Liturgice Ortodoxe</h1>
+    	<img class="oPage_logo" src="images/logo.png" />
 
     	<small>V 5.0.0</small>
 
+    	<h1>Texte Liturgice Ortodoxe</h1>
+
+    	<small>de la</small>
+
+    	<div class="oPage_link">www.teologie.net</div>
+
+
     	<p id="debug"></p>
     </li>
+
+		<li id="page1" class="oPage">
+			<div class="oPage_hero">
+				<img src="images/christ_icon.jpg" />
+			</div>
+
+			<h2 class="oPage_header fillMain">Texte Liturgice Ortodoxe</h2>
+
+			<ul class="oListBare">
+				<li class="oListBare_item fillRoot hasChildren isOpen">Carte de rugaciuni</li>
+				<li class="oListBare_item fillRoot hasChildren">Molitfelnic</li>
+			</ul>
+		</li>
+
   </ul>
 
 <!-- -------------------------------------- -->
 
 <script type="text/javascript">
-    // js here
+
+	var elPageIndex = document.getElementById('page0');
+	var elPageHome  = document.getElementById('page1');
+
+	function hideIndexPage () {
+		elPageIndex.classList.add('animated');
+		elPageIndex.classList.add('slideOutLeft');
+		elPageHome.classList.add('animated');
+		elPageHome.classList.add('slideInRight');
+		elPageHome.classList.add('isActive');
+
+  	setTimeout( function () {
+  		elPageIndex.classList.remove('isActive');
+  		elPageIndex.classList.add('isRendered');
+  	}, 1000);
+
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+
+  	setTimeout( function () {
+  		hideIndexPage();
+  	}, 2000);
+
+  });
+
 </script>
 
 </body>
