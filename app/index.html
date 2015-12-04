@@ -206,7 +206,7 @@
 
     function bookClicked () {
         var bookId = this.getAttribute('data-book');
-        var bookUrl = 'books/' + bookId + '.json'
+        var bookUrl = 'chapter_' + bookId + '.json'
         var xhr = new XMLHttpRequest();
         xhr.open('GET', bookUrl);
         xhr.send(null);
@@ -237,12 +237,14 @@
 	    	var responseText = e.target.response.toString();
 	    	elDebug.innerHTML += responseText;
 	    	mainBooks = JSON.parse(responseText);
-            changePage(elPageIndex, elPageHome, listBooks);
+            // changePage(elPageIndex, elPageHome, listBooks);
+            setTimeout( function () {
+                changePage(elPageIndex, elPageHome, listBooks);
+            }, 2000);
 	    };
 
 	    oReq.onreadystatechange = function () {
-	      document.getElementById('debug').innerHTML+=' | Was clicked' +
-	        toReadyStateDescription(oReq.readyState);
+	      console.log(oReq.readyState);
 	    };
 	    oReq.open('GET', "books.json", true);
 	    oReq.send();
@@ -264,9 +266,6 @@
 //                 	elDebug.textContent += 'Error: ' + xhr.status;
 //                 }
 
-// //                setTimeout( function () {
-//                     //changePage(elPageIndex, elPageHome, listBooks);
-// //                }, 2000);
 //             }
 //         };
     });
