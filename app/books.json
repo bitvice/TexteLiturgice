@@ -1,0 +1,34 @@
+[
+    {"title":"Carte de rugăciuni","id":"rugaciuni","books":
+        [
+            {"title":"Rugăciuni zilnice","id": "zilnice"},
+            {"title":"Canoane şi Acatiste","id": "canoane-acatiste"},
+            {"title":"Rânduiala împărtășirii","id": "ocazionale"},
+            {"title":"Despre cartea de rugăciuni","id": "prefata"}
+        ]
+    },
+    {"title":"Ceaslovul parohial","id":"ceaslov","books":
+        [
+            {"title":"Laudele zilnice","id": "laude-zilnice"},
+            {"title":"Psalmii ceasurilor","id": "psalmii-ceasurilor"},
+            {"title":"Sfânta Liturghie","id": "sfanta-liturghie"}
+        ]
+    },
+    {"title":"Slujbe duminicale și praznicale","id":"slujbe","books":
+        [
+            {"title":"Octoihul","id":"octoih"},
+            {"title":"Mineiul","id":"minei"},
+            {"title":"Triodul","id":"triod"},
+            {"title":"Penticostarul","id":"penticostar"},
+            {"title":"Colinde și alte cântări","id":"colinde-cantari"}
+        ]
+    },
+    {"title":"Slujbe din Molitfelnic","id":"molitfelnic","books":
+        [
+            {"title":"Rugăciuni după naştere","id":"nastere"},
+            {"title":"Rânduiala botezului","id":"botez"},
+            {"title":"Slujba Nunții","id":"nunta"},
+            {"title":"Slujba Sfântului Maslu","id":"maslu"}
+        ]
+    }
+]

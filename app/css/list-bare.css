@@ -14,12 +14,17 @@
 
 	.oListBare_item {
 		display: block;
-		margin: 0 0 .2rem;
-		line-height: 2;
-		padding: 0 1rem;
+		margin: 0 0 2px;
 	}
 
-		.oListBare_item.hasChildren:before {
+	.oListBare_lbl {
+		display: block;
+		line-height: 2;
+		padding: 0 1rem;
+		cursor: pointer;
+	}
+
+		.oListBare_lbl.hasChildren:before {
 			content: '';
 			display: inline-block;
 			vertical-align: middle;
@@ -36,9 +41,19 @@
 							transform: rotate(45deg);
 		}
 
-		.oListBare_item.hasChildren.isOpen:before {
+		input.oListBare_box:checked + .oListBare_group > .oListBare_lbl.hasChildren:before {
 			margin-top: 0;
 			
 			-webkit-transform: rotate(-135deg);
 							transform: rotate(-135deg);
 		}
+
+
+	.oListBare_children,
+	input.oListBare_box { display: none; }
+
+	input.oListBare_box:checked + .oListBare_group > .oListBare_children {
+		display: block;
+		padding-bottom: 0.5rem;
+	}
+

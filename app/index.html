@@ -10,31 +10,30 @@
 <body>
 
 	<ul class="oPage_list">
-		<li id="page0" class="oPage isActive uCenter">
-    	<img class="oPage_logo" src="images/logo.png" />
+		<li id="Page0" class="oPage isActive uCenter">
+        	<img class="oPage_logo" src="images/logo.png" />
 
-    	<small>V 5.0.0</small>
+        	<small>V 5.0.0</small>
 
-    	<h1>Texte Liturgice Ortodoxe</h1>
+        	<h1>Texte Liturgice Ortodoxe</h1>
 
-    	<small>de la</small>
+        	<small>de la</small>
 
-    	<div class="oPage_link">www.teologie.net</div>
+        	<div class="oPage_link">www.teologie.net</div>
+        </li>
 
-
-    	<p id="debug"></p>
-    </li>
-
-		<li id="page1" class="oPage">
+		<li id="Page1" class="oPage">
 			<div class="oPage_hero">
 				<img src="images/christ_icon.jpg" />
 			</div>
 
 			<h2 class="oPage_header fillMain">Texte Liturgice Ortodoxe</h2>
 
-			<ul class="oListBare">
-				<li class="oListBare_item fillRoot hasChildren isOpen">Carte de rugaciuni</li>
+			<ul id="MainBooks" class="oListBare">
+
+<!-- 				<li class="oListBare_item fillRoot hasChildren isOpen">Carte de rugaciuni</li>
 				<li class="oListBare_item fillRoot hasChildren">Molitfelnic</li>
+ -->
 			</ul>
 		</li>
 
@@ -44,8 +43,11 @@
 
 <script type="text/javascript">
 
-	var elPageIndex = document.getElementById('page0');
-	var elPageHome  = document.getElementById('page1');
+	var elPageIndex = document.getElementById('Page0');
+	var elPageHome  = document.getElementById('Page1');
+    var elMainBooks = document.getElementById('MainBooks');
+
+    var mainBooks = [];
 
 	function hideIndexPage () {
 		elPageIndex.classList.add('animated');
@@ -54,20 +56,108 @@
 		elPageHome.classList.add('slideInRight');
 		elPageHome.classList.add('isActive');
 
-  	setTimeout( function () {
-  		elPageIndex.classList.remove('isActive');
-  		elPageIndex.classList.add('isRendered');
-  	}, 1000);
+      	setTimeout( function () {
+      		elPageIndex.classList.remove('isActive');
+      		elPageIndex.classList.add('isRendered');
 
+            listBooks();
+      	}, 1000);
 	}
+
+    function listBooks () {
+        for (var i = 0; i < mainBooks.length; i++) {
+            addBook(mainBooks[i], i);
+        }
+    }
+
+    function addBook (currentBook, index, elParent) {
+        var elItem = document.createElement("li");
+        var elCheckbox = document.createElement("input");
+        var elLbl = document.createElement('label');
+        var elGroup = document.createElement('div');
+        var text = document.createTextNode(currentBook.title);
+        var wait = (index + 1) * 300;
+        var type = 'Root';
+        var hasChildren = false;
+        var elList;
+        var id = "Book" + index;
+        var idBox = id +  "_box";
+        var animEffect = 'bounceInRight';
+
+
+        elCheckbox.setAttribute('type', 'checkbox');
+        elCheckbox.className = 'oListBare_box';
+
+        elGroup.className = 'oListBare_group';
+        elGroup.appendChild(elLbl);
+
+        elLbl.appendChild(text);
+        elLbl.className = 'oListBare_lbl';
+
+        elItem.setAttribute('id', id);
+        elItem.className = 'oListBare_item';
+        elItem.appendChild(elCheckbox);
+        elItem.appendChild(elGroup);
+
+        if (typeof(elParent) == 'undefined') {
+            elParent = elMainBooks;
+        } else {
+            type = 'Secondary';
+            idBox = type + idBox;
+            wait = 0;
+            animEffect = 'fadeIn';
+        }
+
+        elCheckbox.setAttribute('id', idBox);
+        elLbl.setAttribute('for', idBox);
+        elLbl.classList.add('fill' + type);
+        elLbl.classList.add(animEffect);
+        elLbl.classList.add('animated');
+
+        if (typeof(currentBook.books) != 'undefined' && currentBook.books.length) {
+            elList = document.createElement('ul');
+            elList.className = 'oListBare_children';
+            elGroup.appendChild(elList);
+
+            elLbl.classList.add('hasChildren');
+            hasChildren = true;
+        }
+
+        setTimeout(function () {
+            elParent.appendChild(elItem);
+
+            if (hasChildren) {
+                for (var i = 0; i < currentBook.books.length; i++) {
+                    addBook(currentBook.books[i], i, elList);
+                }
+            }
+        }, wait);
+    }
 
 	document.addEventListener('DOMContentLoaded', function() {
 
-  	setTimeout( function () {
-  		hideIndexPage();
-  	}, 2000);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'books.json');
+        xhr.send(null);
 
-  });
+        xhr.onreadystatechange = function () {
+            var DONE = 4; // readyState 4 means the request is done.
+            var OK = 200; // status 200 is a successful return.
+
+            if (xhr.readyState === DONE) {
+                if (xhr.status === OK) {
+                  console.log(xhr.responseText); // 'This is the returned text.'
+                  mainBooks = JSON.parse(xhr.responseText);
+                } else {
+                  console.log('Error: ' + xhr.status); // An error occurred during the request.
+                }
+
+                setTimeout( function () {
+                    hideIndexPage();
+                }, 200);
+            }
+        };
+    });
 
 </script>
 
