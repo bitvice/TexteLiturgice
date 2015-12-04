@@ -1,17 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    <link rel="stylesheet" href="css/app.css" type="text/css">
-    <link rel="stylesheet" href="css/page.css" type="text/css">
-    <link rel="stylesheet" href="css/list-bare.css" type="text/css">
-    <link rel="stylesheet" href="css/animate.css" type="text/css">
-    <link rel="stylesheet" href="css/utils.css" type="text/css">
+    <link rel="stylesheet" href="app.css" type="text/css">
+    <link rel="stylesheet" href="page.css" type="text/css">
+    <link rel="stylesheet" href="list-bare.css" type="text/css">
+    <link rel="stylesheet" href="animate.css" type="text/css">
+    <link rel="stylesheet" href="utils.css" type="text/css">
 </head>
 <body>
 
 	<ul class="oPage_list">
 		<li id="Page0" class="oPage isActive uCenter">
-        	<img class="oPage_logo" src="images/logo.png" />
+        	<img class="oPage_logo" src="logo.png" />
 
         	<small>V 5.0.0</small>
 
@@ -20,11 +20,13 @@
         	<small>de la</small>
 
         	<div class="oPage_link">www.teologie.net</div>
+
+            <div id="debug"></div>
         </li>
 
 		<li id="Page1" class="oPage">
 			<div class="oPage_hero">
-				<img src="images/christ_icon.jpg" />
+				<img src="christ_icon.jpg" />
 			</div>
 
 			<h2 id="AppTitle" class="oPage_header fillMain">Texte Liturgice Ortodoxe</h2>
@@ -43,10 +45,11 @@
 <!-- -------------------------------------- -->
 
 <script type="text/javascript">
-
+    console.log('Start JS');
     var DONE = 4; // readyState 4 means the request is done.
     var OK = 200; // status 200 is a successful return.
 
+    var elDebug        = document.getElementById('debug');
 	var elPageIndex    = document.getElementById('Page0');
 	var elPageHome     = document.getElementById('Page1');
     var elPageChapter  = document.getElementById('Page2');
@@ -223,29 +226,49 @@
 
                 setTimeout( function () {
                     changePage(elPageHome, elPageChapter, function () { listChaper(chapterBooks, bookId); });
-                }, 200);
+                }, 2000);
             }
         };
     }
 
 	document.addEventListener('DOMContentLoaded', function() {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'books.json');
-        xhr.send(null);
+    	var oReq = new XMLHttpRequest();
+	    oReq.onload = function (e) {
+	    	var responseText = e.target.response.toString();
+	    	elDebug.innerHTML += responseText;
+	    	mainBooks = JSON.parse(responseText);
+            changePage(elPageIndex, elPageHome, listBooks);
+	    };
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === DONE) {
-                if (xhr.status === OK) {
-                  mainBooks = JSON.parse(xhr.responseText);
-                } else {
-                  console.log('Error: ' + xhr.status); // An error occurred during the request.
-                }
+	    oReq.onreadystatechange = function () {
+	      document.getElementById('debug').innerHTML+=' | Was clicked' +
+	        toReadyStateDescription(oReq.readyState);
+	    };
+	    oReq.open('GET', "books.json", true);
+	    oReq.send();
 
-                setTimeout( function () {
-                    changePage(elPageIndex, elPageHome, listBooks);
-                }, 200);
-            }
-        };
+//         var xhr = new XMLHttpRequest();
+//         xhr.open('GET', 'books.json');
+//         xhr.send(null);
+//         console.log('Request books.json');
+
+//         xhr.onreadystatechange = function () {
+//             if (xhr.readyState === DONE) {
+//             	elDebug.textContent += 'Received data';
+//                 if (xhr.status === OK) {
+                              
+//                 	elDebug.textContent += xhr.responseText;
+//                   	mainBooks = JSON.parse(xhr.responseText);
+//                     console.log(mainBooks);
+//                 } else {
+//                 	elDebug.textContent += 'Error: ' + xhr.status;
+//                 }
+
+// //                setTimeout( function () {
+//                     //changePage(elPageIndex, elPageHome, listBooks);
+// //                }, 2000);
+//             }
+//         };
     });
 
 </script>
