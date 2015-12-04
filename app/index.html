@@ -27,15 +27,16 @@
 				<img src="images/christ_icon.jpg" />
 			</div>
 
-			<h2 class="oPage_header fillMain">Texte Liturgice Ortodoxe</h2>
+			<h2 id="AppTitle" class="oPage_header fillMain">Texte Liturgice Ortodoxe</h2>
 
-			<ul id="MainBooks" class="oListBare">
-
-<!-- 				<li class="oListBare_item fillRoot hasChildren isOpen">Carte de rugaciuni</li>
-				<li class="oListBare_item fillRoot hasChildren">Molitfelnic</li>
- -->
-			</ul>
+			<ul id="MainBooks" class="oListBare"></ul>
 		</li>
+
+        <li id="Page2" class="oPage">
+            <h2 id="ChapterTitle" class="oPage_header fillMain"></h2>
+
+            <ul id="ChapterBooks" class="oListBare"></ul>
+        </li>
 
   </ul>
 
@@ -43,31 +44,70 @@
 
 <script type="text/javascript">
 
-	var elPageIndex = document.getElementById('Page0');
-	var elPageHome  = document.getElementById('Page1');
-    var elMainBooks = document.getElementById('MainBooks');
+    var DONE = 4; // readyState 4 means the request is done.
+    var OK = 200; // status 200 is a successful return.
 
+	var elPageIndex    = document.getElementById('Page0');
+	var elPageHome     = document.getElementById('Page1');
+    var elPageChapter  = document.getElementById('Page2');
+    var elMainBooks    = document.getElementById('MainBooks');
+
+    var pagesList = [];
     var mainBooks = [];
 
-	function hideIndexPage () {
-		elPageIndex.classList.add('animated');
-		elPageIndex.classList.add('slideOutLeft');
-		elPageHome.classList.add('animated');
-		elPageHome.classList.add('slideInRight');
-		elPageHome.classList.add('isActive');
+    function changePage (elPageCurrent, elPageNew, fnCallback) {
+        elPageCurrent.classList.add('animated');
+        elPageCurrent.classList.add('slideOutLeft');
+        elPageNew.classList.add('animated');
+        elPageNew.classList.add('slideInRight');
+        elPageNew.classList.add('isActive');
 
-      	setTimeout( function () {
-      		elPageIndex.classList.remove('isActive');
-      		elPageIndex.classList.add('isRendered');
+        setTimeout(function () {
+            elPageCurrent.classList.remove('animated');
+            elPageCurrent.classList.remove('slideOutLeft');
+            elPageCurrent.classList.remove('isActive');
+            elPageCurrent.classList.add('isRendered');
+            elPageNew.classList.remove('animated');
+            elPageNew.classList.remove('slideInRight');
 
-            listBooks();
-      	}, 1000);
-	}
+            if (typeof(fnCallback) == "function") {
+                fnCallback.call();
+            }
+        }, 1000);
 
-    function listBooks () {
-        for (var i = 0; i < mainBooks.length; i++) {
-            addBook(mainBooks[i], i);
+        if (pagesList.length == 0) {
+            pagesList.push(elPageCurrent);
         }
+
+        pagesList.push(elPageNew);
+    }
+
+    function backPage () {
+        var elPageCurrent = pagesList[pagesList.length - 1];
+        var elPagePrev;
+
+        if (pagesList.length > 2) {
+            elPageCurrent.classList.add('animated');
+            elPageCurrent.classList.add('slideOutRight');
+
+            elPagePrev = pagesList[pagesList.length - 2];
+            elPagePrev.classList.remove('isRendered');
+            elPagePrev.classList.add('animated');
+            elPagePrev.classList.add('slideInLeft');
+            elPagePrev.classList.add('isActive');
+
+            setTimeout(function () {
+                elPageCurrent.classList.remove('isActive');
+                elPageCurrent.classList.remove('animated');
+                elPageCurrent.classList.remove('slideOutRight');
+                elPagePrev.classList.remove('slideInLeft');
+            }, 1000);
+
+        } else {
+            alert("Exit APP");
+        }
+
+        pagesList.pop();
     }
 
     function addBook (currentBook, index, elParent) {
@@ -80,7 +120,7 @@
         var type = 'Root';
         var hasChildren = false;
         var elList;
-        var id = "Book" + index;
+        var id = "Book_" + currentBook.id;
         var idBox = id +  "_box";
         var animEffect = 'bounceInRight';
 
@@ -104,12 +144,13 @@
         } else {
             type = 'Secondary';
             idBox = type + idBox;
-            wait = 0;
+            // wait = 0;
             animEffect = 'fadeIn';
         }
 
         elCheckbox.setAttribute('id', idBox);
         elLbl.setAttribute('for', idBox);
+        elLbl.setAttribute('data-book', currentBook.id);
         elLbl.classList.add('fill' + type);
         elLbl.classList.add(animEffect);
         elLbl.classList.add('animated');
@@ -121,6 +162,8 @@
 
             elLbl.classList.add('hasChildren');
             hasChildren = true;
+        } else {
+            elLbl.addEventListener('click', bookClicked);
         }
 
         setTimeout(function () {
@@ -134,26 +177,72 @@
         }, wait);
     }
 
-	document.addEventListener('DOMContentLoaded', function() {
+    function listBooks () {
+        var elChapterTitle = document.getElementById('AppTitle');
 
+        elChapterTitle.addEventListener('click', backPage);
+
+        for (var i = 0; i < mainBooks.length; i++) {
+            addBook(mainBooks[i], i);
+        }
+    }
+
+    function listChaper (chapterBooks, parentBookId) {
+        var elChapterTitle = document.getElementById('ChapterTitle');
+        var elChapterBooks = document.getElementById('ChapterBooks');
+        var elParentBook   = document.getElementById('Book_' + parentBookId);
+        var elParentLabel  = elParentBook.getElementsByTagName('label')[0];
+
+        elChapterTitle.addEventListener('click', backPage);
+        elChapterTitle.textContent = elParentLabel.textContent;
+
+        for (var i = 0; i < chapterBooks.length; i++) {
+            addBook(chapterBooks[i], i, elChapterBooks);
+        }
+    }
+
+    function bookClicked () {
+        var bookId = this.getAttribute('data-book');
+        var bookUrl = 'books/' + bookId + '.json'
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', bookUrl);
+        xhr.send(null);
+        console.log("Request " + bookUrl);
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === DONE) {
+                var chapterBooks = [];
+
+                if (xhr.status === OK) {
+                  console.log("Received data");
+                  console.log(xhr.responseText); // 'This is the returned text.'
+                  chapterBooks = JSON.parse(xhr.responseText);
+                } else {
+                  console.log('Error: ' + xhr.status); // An error occurred during the request.
+                }
+
+                setTimeout( function () {
+                    changePage(elPageHome, elPageChapter, function () { listChaper(chapterBooks, bookId); });
+                }, 200);
+            }
+        };
+    }
+
+	document.addEventListener('DOMContentLoaded', function() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'books.json');
         xhr.send(null);
 
         xhr.onreadystatechange = function () {
-            var DONE = 4; // readyState 4 means the request is done.
-            var OK = 200; // status 200 is a successful return.
-
             if (xhr.readyState === DONE) {
                 if (xhr.status === OK) {
-                  console.log(xhr.responseText); // 'This is the returned text.'
                   mainBooks = JSON.parse(xhr.responseText);
                 } else {
                   console.log('Error: ' + xhr.status); // An error occurred during the request.
                 }
 
                 setTimeout( function () {
-                    hideIndexPage();
+                    changePage(elPageIndex, elPageHome, listBooks);
                 }, 200);
             }
         };
