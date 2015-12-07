@@ -4,6 +4,7 @@
 	bottom:  0 ;
 	left:  100%;
 	width: 100%;
+	overflow: auto;
 
 	background-image: url('old_paper.jpg');
 	background-size: 100% auto;
@@ -55,16 +56,21 @@
 	}
 
 .fillMain {
-	background-color: rgba(120,40,0,0.44);
+	background-color: rgba(120,40,0,0.3);
 	color: #6F1D0A;
 }
 
 .fillRoot {
-	background-color: rgba(120,40,0,0.44);
+	background-color: rgba(120,40,0,0.4);
 	color: #fff;
 }
 
+	.fillRoot:hover { background-color: rgba(120,40,0,0.5); }
+
+
 .fillSecondary {
-	background-color: rgba(200,200,200,0.44);
+	background-color: rgba(255,255,255,0.4);
 	color: #6F1D0A;
 }
+
+	.fillSecondary:hover { background-color: rgba(255,255,255,0.6); }

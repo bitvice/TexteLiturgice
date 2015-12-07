@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" href="app.css" type="text/css">
     <link rel="stylesheet" href="page.css" type="text/css">
+    <link rel="stylesheet" href="page-content.css" type="text/css">
     <link rel="stylesheet" href="list-bare.css" type="text/css">
     <link rel="stylesheet" href="animate.css" type="text/css">
     <link rel="stylesheet" href="utils.css" type="text/css">
@@ -40,6 +41,8 @@
             <ul id="ChapterBooks" class="oListBare"></ul>
         </li>
 
+        <li id="Page3" class="oPage oContent"></li>
+
   </ul>
 
 <!-- -------------------------------------- -->
@@ -53,7 +56,12 @@
 	var elPageIndex    = document.getElementById('Page0');
 	var elPageHome     = document.getElementById('Page1');
     var elPageChapter  = document.getElementById('Page2');
+    var elPageContent  = document.getElementById('Page3');
     var elMainBooks    = document.getElementById('MainBooks');
+
+    var urls = {
+        books: "books.json"
+    }
 
     var pagesList = [];
     var mainBooks = [];
@@ -204,70 +212,117 @@
         }
     }
 
-    function bookClicked () {
-        var bookId = this.getAttribute('data-book');
-        var bookUrl = 'chapter_' + bookId + '.json'
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', bookUrl);
-        xhr.send(null);
-        console.log("Request " + bookUrl);
+    function chapterDataReceived (bookId, chapterBooks) {
+        var elChapterBooks = document.getElementById('ChapterBooks');
 
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === DONE) {
-                var chapterBooks = [];
+        elChapterBooks.innerHTML = "";
 
-                if (xhr.status === OK) {
-                  console.log("Received data");
-                  console.log(xhr.responseText); // 'This is the returned text.'
-                  chapterBooks = JSON.parse(xhr.responseText);
-                } else {
-                  console.log('Error: ' + xhr.status); // An error occurred during the request.
-                }
-
-                setTimeout( function () {
-                    changePage(elPageHome, elPageChapter, function () { listChaper(chapterBooks, bookId); });
-                }, 2000);
-            }
-        };
+        changePage(elPageHome, elPageChapter, function () {
+            listChaper(chapterBooks, bookId);
+        });
     }
 
+    function bookClicked () {
+        if (pagesList.length == 2) {
+            var bookId = this.getAttribute('data-book');
+            var bookUrl = 'chapter_' + bookId + '.json';
+
+            promise(bookUrl, function (responseText) {
+                chapterDataReceived(bookId, JSON.parse(responseText));
+            }, errorHandler);
+        }
+
+        if (pagesList.length == 3) {
+            var bookId = this.getAttribute('data-book');
+            var bookUrl = 'book_' + bookId + '.html';
+
+            console.log("Request " + bookUrl);
+
+            elPageContent.innerHTML = "";
+
+            changePage(elPageChapter, elPageContent);
+
+
+            promise(bookUrl, function (responseText) {
+                console.log("Received data");
+                console.log(responseText); // 'This is the returned text.'
+
+                elPageContent.innerHTML = responseText;
+            }, errorHandler);
+        }
+
+        // var xhr = new XMLHttpRequest();
+        // xhr.open('GET', bookUrl);
+        // xhr.send(null);
+        // console.log("Request " + bookUrl);
+
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState === DONE) {
+        //         var chapterBooks = [];
+
+        //         if (xhr.status === OK) {
+        //           console.log("Received data");
+        //           console.log(xhr.responseText); // 'This is the returned text.'
+        //           chapterBooks = JSON.parse(xhr.responseText);
+        //         } else {
+        //           console.log('Error: ' + xhr.status); // An error occurred during the request.
+        //         }
+
+        //         setTimeout( function () {
+        //             changePage(elPageHome, elPageChapter, function () { listChaper(chapterBooks, bookId); });
+        //         }, 2000);
+        //     }
+        // };
+    }
+
+    function promise (url, fnSuccess, fnError) {
+        var oReq = new XMLHttpRequest();
+
+        oReq.onload = function (e) {
+            if (typeof(fnSuccess) == "function") {
+                var responseText = e.target.response.toString();
+
+                fnSuccess.call(this,[responseText]);
+            }
+        };
+
+        oReq.onerror = function (e) {
+            if (typeof(fnSuccess) == "function") {
+                var responseText = e.target.response.toString();
+
+                fnError.call(this, [responseText]);
+            }
+        };
+
+        oReq.onreadystatechange = function () {
+          console.log(oReq.readyState);
+        };
+
+        oReq.open('GET', url, true);
+
+        oReq.send();
+    }
+
+    function errorHandler () {
+        console.log("ERROR: ");
+        console.error(errorMessage);
+    }
+
+
+
+    //////////
+
+
+
 	document.addEventListener('DOMContentLoaded', function() {
-    	var oReq = new XMLHttpRequest();
-	    oReq.onload = function (e) {
-	    	var responseText = e.target.response.toString();
-	    	elDebug.innerHTML += responseText;
-	    	mainBooks = JSON.parse(responseText);
-            // changePage(elPageIndex, elPageHome, listBooks);
+
+        promise(urls.books, function (responseText) {
+            mainBooks = JSON.parse(responseText);
             setTimeout( function () {
                 changePage(elPageIndex, elPageHome, listBooks);
             }, 2000);
-	    };
+        }, errorHandler);
 
-	    oReq.onreadystatechange = function () {
-	      console.log(oReq.readyState);
-	    };
-	    oReq.open('GET', "books.json", true);
-	    oReq.send();
-
-//         var xhr = new XMLHttpRequest();
-//         xhr.open('GET', 'books.json');
-//         xhr.send(null);
-//         console.log('Request books.json');
-
-//         xhr.onreadystatechange = function () {
-//             if (xhr.readyState === DONE) {
-//             	elDebug.textContent += 'Received data';
-//                 if (xhr.status === OK) {
-                              
-//                 	elDebug.textContent += xhr.responseText;
-//                   	mainBooks = JSON.parse(xhr.responseText);
-//                     console.log(mainBooks);
-//                 } else {
-//                 	elDebug.textContent += 'Error: ' + xhr.status;
-//                 }
-
-//             }
-//         };
     });
 
 </script>
