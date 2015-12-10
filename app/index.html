@@ -14,7 +14,7 @@
 		<li id="Page0" class="oPage isActive uCenter">
         	<img class="oPage_logo" src="logo.png" />
 
-        	<small>V 5.0.0</small>
+        	<small id="AppVersion">V 5.0.1</small>
 
         	<h1>Texte Liturgice Ortodoxe</h1>
 
@@ -41,14 +41,15 @@
             <ul id="ChapterBooks" class="oListBare"></ul>
         </li>
 
-        <li id="Page3" class="oPage oContent"></li>
+        <li id="Page3" class="oPage">
+            <main id="Page3Content" class="oContent text-normal"></main>
+        </li>
 
   </ul>
 
 <!-- -------------------------------------- -->
 
 <script type="text/javascript">
-    console.log('Start JS');
     var DONE = 4; // readyState 4 means the request is done.
     var OK = 200; // status 200 is a successful return.
 
@@ -56,7 +57,8 @@
 	var elPageIndex    = document.getElementById('Page0');
 	var elPageHome     = document.getElementById('Page1');
     var elPageChapter  = document.getElementById('Page2');
-    var elPageContent  = document.getElementById('Page3');
+    var elPageBook     = document.getElementById('Page3');
+    var elPageContent  = document.getElementById('Page3Content');
     var elMainBooks    = document.getElementById('MainBooks');
 
     var urls = {
@@ -65,6 +67,43 @@
 
     var pagesList = [];
     var mainBooks = [];
+
+
+
+    /// Core section
+
+    function promise (url, fnSuccess, fnError) {
+        var oReq = new XMLHttpRequest();
+
+        oReq.onload = function (e) {
+            if (typeof(fnSuccess) == "function") {
+                var responseText = e.target.response.toString();
+
+                fnSuccess.call(this,[responseText]);
+            }
+        };
+
+        oReq.onerror = function (e) {
+            if (typeof(fnSuccess) == "function") {
+                var responseText = e.target.response.toString();
+
+                fnError.call(this, [responseText]);
+            }
+        };
+
+        oReq.onreadystatechange = function () {
+          console.log(oReq.readyState);
+        };
+
+        oReq.open('GET', url, true);
+
+        oReq.send();
+    }
+
+    function errorHandler () {
+        console.log("ERROR: ");
+        console.error(errorMessage);
+    }
 
     function changePage (elPageCurrent, elPageNew, fnCallback) {
         elPageCurrent.classList.add('animated');
@@ -120,6 +159,79 @@
 
         pagesList.pop();
     }
+
+    function pageContent (strContent) {
+        elPageContent.innerHTML = strContent + mSize();
+
+        mSizeEvents();
+    }
+
+
+
+    /// Size module
+
+    function mSize () {
+        var htmlFooter =
+        '<footer id="ContentFooter">' +
+			'<div id="SizeButtons" class="mSize">' +
+				'<span class="mSize-small">A</span>' +
+				'<span class="mSize-normal mSize-active">A</span>' +
+				'<span class="mSize-large">A</span>' +
+			'</div>' +
+		'</footer>';
+
+        return htmlFooter;
+    }
+
+    function mSizeFind (_inClass) {
+        var elSizeButtons = document.getElementById('SizeButtons');
+        var sizes = elSizeButtons.getElementsByTagName('span');
+
+        _inClass = 'mSize-' + _inClass;
+
+        for (var i in sizes) {
+            if ((' ' + sizes[i].className + ' ').indexOf(' ' + _inClass + ' ') > -1) {
+                return sizes[i];
+            }
+        }
+        return false;
+    }
+
+    function mSizeEvents () {
+        var elSizeButtons = document.getElementById('SizeButtons');
+
+        elSizeButtons.addEventListener('click', function () {
+			var btnSize     = document.getElementById('btn-size');
+			var elActive    = mSizeFind('active');
+            var classContent = elPageContent.classList[1];
+            var classActive = 'mSize-active';
+
+            elActive.classList.remove(classActive);
+
+            var sizeModifier;
+
+            switch (classContent) {
+                case 'text-normal':
+                    sizeModifier = 'large';
+                    break;
+                case 'text-large':
+                    sizeModifier = 'small';
+                    break;
+                case 'text-small':
+                    sizeModifier = 'normal';
+                    break;
+                default:
+            }
+
+            mSizeFind(sizeModifier).classList.add(classActive);
+            elPageContent.classList.remove(classContent);
+            elPageContent.classList.add("text-" + sizeModifier);
+        });
+    }
+
+
+
+    /// Book section
 
     function addBook (currentBook, index, elParent) {
         var elItem = document.createElement("li");
@@ -236,83 +348,21 @@
             var bookId = this.getAttribute('data-book');
             var bookUrl = 'book_' + bookId + '.html';
 
-            console.log("Request " + bookUrl);
-
             elPageContent.innerHTML = "";
-
-            changePage(elPageChapter, elPageContent);
-
+            changePage(elPageChapter, elPageBook);
 
             promise(bookUrl, function (responseText) {
                 console.log("Received data");
                 console.log(responseText); // 'This is the returned text.'
 
-                elPageContent.innerHTML = responseText;
+                pageContent(responseText);
             }, errorHandler);
         }
-
-        // var xhr = new XMLHttpRequest();
-        // xhr.open('GET', bookUrl);
-        // xhr.send(null);
-        // console.log("Request " + bookUrl);
-
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState === DONE) {
-        //         var chapterBooks = [];
-
-        //         if (xhr.status === OK) {
-        //           console.log("Received data");
-        //           console.log(xhr.responseText); // 'This is the returned text.'
-        //           chapterBooks = JSON.parse(xhr.responseText);
-        //         } else {
-        //           console.log('Error: ' + xhr.status); // An error occurred during the request.
-        //         }
-
-        //         setTimeout( function () {
-        //             changePage(elPageHome, elPageChapter, function () { listChaper(chapterBooks, bookId); });
-        //         }, 2000);
-        //     }
-        // };
-    }
-
-    function promise (url, fnSuccess, fnError) {
-        var oReq = new XMLHttpRequest();
-
-        oReq.onload = function (e) {
-            if (typeof(fnSuccess) == "function") {
-                var responseText = e.target.response.toString();
-
-                fnSuccess.call(this,[responseText]);
-            }
-        };
-
-        oReq.onerror = function (e) {
-            if (typeof(fnSuccess) == "function") {
-                var responseText = e.target.response.toString();
-
-                fnError.call(this, [responseText]);
-            }
-        };
-
-        oReq.onreadystatechange = function () {
-          console.log(oReq.readyState);
-        };
-
-        oReq.open('GET', url, true);
-
-        oReq.send();
-    }
-
-    function errorHandler () {
-        console.log("ERROR: ");
-        console.error(errorMessage);
     }
 
 
 
-    //////////
-
-
+    /// Bootstrap actions when page is loaded
 
 	document.addEventListener('DOMContentLoaded', function() {
 
@@ -320,7 +370,7 @@
             mainBooks = JSON.parse(responseText);
             setTimeout( function () {
                 changePage(elPageIndex, elPageHome, listBooks);
-            }, 2000);
+            }, 1000);
         }, errorHandler);
 
     });

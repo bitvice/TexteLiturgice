@@ -12,21 +12,21 @@
 					box-sizing: border-box;
 }
 
-.oContent.text-small { font-size: 62.5%; }
-.oContent.text-normal { font-size: 80%; }
-.oContent.text-large { font-size: 100%; }
+.oContent.text-small  { font-size: .6rem; }
+.oContent.text-normal { font-size: .8rem; }
+.oContent.text-large  { font-size:  1rem; }
 
 .oContent h1
 {
-	font-size: 1.6rem;
+	font-size: 1.6em;
 }
 .oContent h3
 {
-	font-size: 1.4rem;
+	font-size: 1.4em;
 }
 .oContent h4
 {
-	font-size: 1.2rem;
+	font-size: 1.2em;
 }
 
 .oContent h1.red
@@ -95,7 +95,7 @@
 	text-indent: 0;
 }
 
-.oContent #footer
+.oContent footer
 {
 	position: fixed;
 	bottom: 0;
@@ -103,7 +103,7 @@
 	width: 96%;
 }
 
-.oContent .btn-size
+.oContent .mSize
 {
 	float: right;
 	padding: 5px 10px;
@@ -115,7 +115,7 @@
 	text-align:center;
 	text-decoration: none;
 }
-.oContent .btn-size > span.active { color: #333; }
-.oContent .btn-size .size-small 	{ font-size: 10px; }
-.oContent .btn-size .size-normal 	{ font-size: 13px; }
-.oContent .btn-size .size-large 	{ font-size: 16px; }
+.oContent .mSize-active { color: #333; }
+.oContent .mSize-small 	{ font-size: .6rem; }
+.oContent .mSize-normal	{ font-size: .8rem; }
+.oContent .mSize-large 	{ font-size:  1rem; }
